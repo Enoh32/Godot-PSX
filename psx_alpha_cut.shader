@@ -1,5 +1,5 @@
 shader_type spatial; 
-render_mode skip_vertex_transform, diffuse_lambert, specular_disabled, vertex_lighting;
+render_mode skip_vertex_transform, cull_disabled, diffuse_lambert, specular_disabled, vertex_lighting;
 
 uniform vec4 tint_color : hint_color = vec4(1.0, 1.0, 1.0, 1.0);
 uniform sampler2D diffuse_tex : hint_albedo;
@@ -32,11 +32,14 @@ void vertex() {
 	if(vdepth < 0.0 || vdepth > cull_far){
 		VERTEX = vec3(0.0);
 	}
+	vdepth = round(vdepth * 8.0)/8.0;
 }
 
 void fragment() {
 	vec4 tex = texture(diffuse_tex, UV / VERTEX.z);
 	ALBEDO = tex.rgb * COLOR.rgb * tint_color.rgb;
+	ALPHA = tex.a;
+	ALPHA_SCISSOR = 0.5;
 	
 	SPECULAR = 0.0;
 	ROUGHNESS = 1.0;
